@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # Local apps
     'core',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -106,8 +107,8 @@ CORS_ALLOWED_METHODS = [
 ]
 
 # Celery Configuration
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -119,4 +120,31 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
-} 
+}
+
+# Support Modules Settings
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+# Module-specific settings
+MODULE_SETTINGS = {
+    'text': {
+        'default_language': 'en',
+        'supported_languages': ['en', 'pl'],
+        'max_text_length': 5000,
+    },
+    'image': {
+        'max_size': 10 * 1024 * 1024,  # 10MB
+        'supported_formats': ['jpg', 'jpeg', 'png'],
+    },
+    'sound': {
+        'max_duration': 300,  # seconds
+        'supported_formats': ['mp3', 'wav'],
+    },
+    'llm': {
+        'default_model': 'gpt-4',
+        'max_tokens': 2000,
+        'timeout': 30,  # seconds
+    }
+}
+
+ASGI_APPLICATION = 'config.asgi.application' 

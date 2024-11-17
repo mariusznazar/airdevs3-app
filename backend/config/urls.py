@@ -9,4 +9,5 @@ urlpatterns = [
     path('', root_view, name='api-root'),
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),
+    path('api/', include('api.urls')),
 ] 
