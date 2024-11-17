@@ -1,0 +1,15 @@
+{
+  "include": ["**/*.py"],
+  "exclude": ["**/node_modules",
+              "**/__pycache__",
+              "src/experimental",
+              "src/typestubs"
+  ],
+  "ignore": ["src/oldstuff"],
+  "defineConstant": { "DEBUG": true },
+  "venvPath": ".",
+  "venv": "venv",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.12"
+} 

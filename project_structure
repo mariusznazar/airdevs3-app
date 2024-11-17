@@ -1,0 +1,14 @@
+project_root/
+├── frontend/                 # React + Vite frontend
+├── backend/                  # Django backend
+│   ├── core/                # Core module
+│   ├── modules/             # Main functional modules
+│   │   ├── flashcards/
+│   │   ├── notes/
+│   │   └── tasks/
+│   └── support_modules/     # Supporting modules
+│       ├── text/
+│       ├── image/
+│       ├── sound/
+│       └── llm/
+└── docker/                  # Docker configuration 
