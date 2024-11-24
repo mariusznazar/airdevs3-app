@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from core.views import AnalyzeFilesView, AnalysisListView
 
 urlpatterns = [
-    path('models/available', views.available_models, name='available-models'),
+    path('analyze-files/', AnalyzeFilesView.as_view(), name='analyze-files'),
+    path('analyses/', AnalysisListView.as_view(), name='analysis-list'),
 ] 

@@ -10,14 +10,20 @@ class OpenAIClient:
 
     async def chat_completion(
         self,
-        messages: list,
-        model: str = "gpt-4",
+        prompt_key: str = None,
+        prompt_vars: Dict[str, Any] = None,
+        messages: list = None,
+        model: str = "gpt-4o",
         temperature: float = 0.7
     ) -> Dict[str, Any]:
         """
-        Get completion from ChatGPT with raw messages
+        Get completion from ChatGPT with either raw messages or prompt template
         """
         try:
+            if messages is None and prompt_key:
+                prompt = self.prompt_manager.get_prompt(prompt_key, **prompt_vars)
+                messages = [{"role": "user", "content": prompt}]
+            
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=messages,
@@ -81,74 +87,30 @@ class OpenAIClient:
         image_data: str,
         prompt_key: str,
         prompt_vars: Dict[str, Any],
-        model: str = "gpt-4-vision-preview"
+        model: str = "gpt-4o-mini"
     ) -> Dict[str, Any]:
-        """
-        Get completion from GPT-4 Vision
-        """
+        """Get completion from GPT-4 Vision"""
         try:
-            prompt = self.prompt_manager.get_prompt(prompt_key, **prompt_vars)
-            response = await self.client.chat.completions.create(
-                model=model,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt},
-                            {"type": "image_url", "image_url": image_data}
-                        ]
-                    }
-                ],
-                max_tokens=500
-            )
-            return {
-                "status": "success",
-                "content": response.choices[0].message.content
-            }
-        except Exception as e:
-            return {"status": "error", "error": str(e)}
-
-    async def process_universal(
-        self,
-        messages: list,
-        files: Dict[str, Any] = None,
-        model: str = "gpt-4-0125-preview",
-        temperature: float = 0.7
-    ) -> Dict[str, Any]:
-        """
-        Process request with GPT-4 Turbo model that can handle multiple input types
-        """
-        try:
-            # Handle audio transcription first if audio file is present
-            if files and 'audio' in files:
-                transcription = await self.transcribe_audio(
-                    files['audio'],
-                    model="whisper-1"
-                )
-                if transcription["status"] == "error":
-                    return transcription
-                
-                # Add transcription to messages
-                messages.append({
+            messages = [
+                {
                     "role": "user",
-                    "content": f"Audio transcription: {transcription['text']}"
-                })
-
-            # Handle image if present
-            if files and 'image' in files:
-                # Convert messages to include image data
-                for msg in messages:
-                    if msg["role"] == "user" and isinstance(msg["content"], list):
-                        for content in msg["content"]:
-                            if content.get("type") == "image_url":
-                                # Process image data here
-                                pass
-
-            # Use GPT-4 Turbo for the final processing
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Opisz co widzisz na tym zdjęciu, skupiając się na informacjach o ludziach lub usterkach sprzętowych."
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": image_data}
+                        }
+                    ]
+                }
+            ]
+            
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=messages,
-                temperature=temperature
+                max_tokens=500
             )
             
             return {
@@ -156,4 +118,5 @@ class OpenAIClient:
                 "content": response.choices[0].message.content
             }
         except Exception as e:
-            return {"status": "error", "error": str(e)} 
+            return {"status": "error", "error": str(e)}
+        

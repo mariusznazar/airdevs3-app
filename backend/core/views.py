@@ -9,6 +9,11 @@ from modules.openai_client import OpenAIClient
 import base64
 from asgiref.sync import async_to_sync
 from django.http import JsonResponse
+from modules.file_analyzer import FileAnalyzer
+import asyncio
+from .models import FileAnalysis
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -136,3 +141,52 @@ class ImageLLMView(BaseLLMView):
             return Response(response)
         except Exception as e:
             return Response({"error": str(e)}, status=400) 
+
+class AnalyzeFilesView(APIView):
+    def post(self, request):
+        try:
+            analyzer = FileAnalyzer()
+            # Uruchamiamy asynchroniczną funkcję w synchronicznym kontekście
+            result = asyncio.run(analyzer.process())
+            return Response({
+                "status": "success",
+                "data": result
+            })
+        except Exception as e:
+            return Response({
+                "status": "error",
+                "message": str(e)
+            }, status=500) 
+
+class CacheStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        stats = {
+            'total_files': FileAnalysis.objects.count(),
+            'by_type': FileAnalysis.objects.values('file_type').annotate(count=Count('id')),
+            'by_category': FileAnalysis.objects.values('category').annotate(count=Count('id')),
+            'recent': FileAnalysis.objects.order_by('-updated_at')[:5].values(
+                'file_name', 'file_type', 'category', 'updated_at'
+            )
+        }
+        return Response(stats) 
+
+class AnalysisListView(APIView):
+    def get(self, request):
+        analyses = FileAnalysis.objects.all().values(
+            'file_name', 
+            'file_type', 
+            'category', 
+            'content', 
+            'created_at'
+        ).order_by('-created_at')
+        
+        summary = {
+            'total': FileAnalysis.objects.count(),
+            'by_type': dict(FileAnalysis.objects.values_list('file_type').annotate(count=Count('id'))),
+            'by_category': dict(FileAnalysis.objects.values_list('category').annotate(count=Count('id'))),
+            'analyses': list(analyses)
+        }
+        
+        return Response(summary) 

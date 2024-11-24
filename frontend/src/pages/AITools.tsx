@@ -1,18 +1,39 @@
-import React from 'react';
-import LLMInterface from '../components/LLMInterface';
+import { useState } from 'react'
+import TextLLM from '../components/TextLLM.tsx'
+import AudioLLM from '../components/AudioLLM.tsx'
+import ImageLLM from '../components/ImageLLM.tsx'
 
-export const AITools: React.FC = () => {
+export const AITools = () => {
+  const [activeTab, setActiveTab] = useState('text')
+
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-orange-500 mb-2">AI Tools</h1>
-          <p className="text-gray-400">Interact with AI models for text, image, and audio processing</p>
-        </div>
-        <div className="bg-gray-800 rounded-xl shadow-xl p-6 border border-orange-500/20">
-          <LLMInterface />
-        </div>
+    <div>
+      <div className="mb-4">
+        <button
+          className={`mr-2 px-4 py-2 rounded ${activeTab === 'text' ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
+          onClick={() => setActiveTab('text')}
+        >
+          Text
+        </button>
+        <button
+          className={`mr-2 px-4 py-2 rounded ${activeTab === 'audio' ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
+          onClick={() => setActiveTab('audio')}
+        >
+          Audio
+        </button>
+        <button
+          className={`px-4 py-2 rounded ${activeTab === 'image' ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
+          onClick={() => setActiveTab('image')}
+        >
+          Image
+        </button>
+      </div>
+
+      <div className="mt-4">
+        {activeTab === 'text' && <TextLLM />}
+        {activeTab === 'audio' && <AudioLLM />}
+        {activeTab === 'image' && <ImageLLM />}
       </div>
     </div>
-  );
-}; 
+  )
+} 

@@ -99,8 +99,14 @@ cython_debug/
 
 # Documentation
 docs/_build/
-/site
+site
 
 # Uploads
 uploads/
 logs/
+
+# Ignore data directory
+data/
+
+# Ignore all SQL files
+*.sql

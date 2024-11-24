@@ -19,4 +19,18 @@ class ProcessingTask(models.Model):
     ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    result = models.JSONField(null=True, blank=True) 
+    result = models.JSONField(null=True, blank=True)
+
+class FileAnalysis(models.Model):
+    file_name = models.CharField(max_length=255, unique=True)
+    file_type = models.CharField(max_length=10)  # 'txt', 'mp3', 'png'
+    content = models.TextField()
+    category = models.CharField(max_length=10, null=True)  # 'people', 'hardware', 'none'
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['file_name']),
+            models.Index(fields=['file_type']),
+        ] 

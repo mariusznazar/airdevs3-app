@@ -19,12 +19,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third party apps
     'rest_framework',
     'corsheaders',
-    # Local apps
     'core',
-    'channels',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -147,4 +145,13 @@ MODULE_SETTINGS = {
     }
 }
 
-ASGI_APPLICATION = 'config.asgi.application' 
+ASGI_APPLICATION = 'config.asgi.application'
+
+# API Settings
+XYZ_COMPANY_URL = os.getenv('XYZ_COMPANY_URL')
+CENTRAL_URL = os.getenv('CENTRAL_URL')
+DEFAULT_API_KEY = os.getenv('DEFAULT_API_KEY')
+
+# Data directory
+DATA_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'pliki_z_fabryki')
+os.makedirs(DATA_DIR, exist_ok=True) 
