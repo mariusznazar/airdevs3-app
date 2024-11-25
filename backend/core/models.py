@@ -22,11 +22,12 @@ class ProcessingTask(models.Model):
     result = models.JSONField(null=True, blank=True)
 
 class FileAnalysis(models.Model):
-    file_name = models.CharField(max_length=255, unique=True)
-    file_type = models.CharField(max_length=10)  # 'txt', 'mp3', 'png'
-    content = models.TextField()
+    file_name = models.CharField(max_length=255)
+    file_type = models.CharField(max_length=50)
+    content = models.TextField(null=True, blank=True)
     raw_content = models.BinaryField(null=True, blank=True)
-    category = models.CharField(max_length=10, null=True)  # 'people', 'hardware', 'none'
+    category = models.CharField(max_length=50, null=True, blank=True)
+    keywords = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -51,3 +52,8 @@ class Document(models.Model):
 
     def __str__(self):
         return self.url
+
+class TagList(models.Model):
+    tags = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

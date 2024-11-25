@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import { AITools } from './pages/AITools.tsx';
 import { FileAnalyzer } from './pages/FileAnalyzer.tsx';
 import { WebCrawler } from './pages/WebCrawler.tsx';
+import { DocumentTagger } from './pages/DocumentTagger.tsx';
 
 const App: React.FC = () => {
   return (
@@ -35,6 +36,12 @@ const App: React.FC = () => {
                 >
                   Web Crawler
                 </Link>
+                <Link
+                  to="/document-tagger"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-orange-400 hover:bg-gray-800 transition-colors"
+                >
+                  Document Tagger
+                </Link>
               </div>
             </div>
           </div>
@@ -46,6 +53,7 @@ const App: React.FC = () => {
             <Route path="/ai-tools" element={<AITools />} />
             <Route path="/file-analyzer" element={<FileAnalyzer />} />
             <Route path="/web-crawler" element={<WebCrawler />} />
+            <Route path="/document-tagger" element={<DocumentTagger />} />
           </Routes>
         </main>
       </div>

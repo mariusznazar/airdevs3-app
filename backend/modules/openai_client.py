@@ -13,7 +13,7 @@ class OpenAIClient:
         prompt_key: str = None,
         prompt_vars: Dict[str, Any] = None,
         messages: list = None,
-        model: str = "gpt-4o",
+        model: str = "gpt-4o-mini",
         temperature: float = 0.7
     ) -> Dict[str, Any]:
         """

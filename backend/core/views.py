@@ -18,6 +18,7 @@ from modules.web_crawler import WebCrawlerProcessor
 from asgiref.sync import sync_to_async
 from modules.document_analyzer import DocumentAnalyzer
 from functools import wraps
+from modules.document_tagger import DocumentTagger
 
 logger = logging.getLogger(__name__)
 
@@ -238,3 +239,19 @@ async def analyze_arxiv(request):
             "status": "error",
             "message": str(e)
         }, status=500) 
+
+class TagDocumentsView(APIView):
+    @async_view
+    async def post(self, request):
+        try:
+            tagger = DocumentTagger()
+            result = await tagger.process()
+            return Response({
+                "status": "success",
+                "data": result
+            })
+        except Exception as e:
+            return Response({
+                "status": "error",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
