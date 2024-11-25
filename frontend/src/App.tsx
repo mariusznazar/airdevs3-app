@@ -4,6 +4,7 @@ import { AITools } from './pages/AITools.tsx';
 import { FileAnalyzer } from './pages/FileAnalyzer.tsx';
 import { WebCrawler } from './pages/WebCrawler.tsx';
 import { DocumentTagger } from './pages/DocumentTagger.tsx';
+import { GraphProcessor } from './pages/GraphProcessor.tsx';
 
 const App: React.FC = () => {
   return (
@@ -42,6 +43,12 @@ const App: React.FC = () => {
                 >
                   Document Tagger
                 </Link>
+                <Link
+                  to="/graph-processor"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-orange-400 hover:bg-gray-800 transition-colors"
+                >
+                  Graph Processor
+                </Link>
               </div>
             </div>
           </div>
@@ -54,6 +61,7 @@ const App: React.FC = () => {
             <Route path="/file-analyzer" element={<FileAnalyzer />} />
             <Route path="/web-crawler" element={<WebCrawler />} />
             <Route path="/document-tagger" element={<DocumentTagger />} />
+            <Route path="/graph-processor" element={<GraphProcessor />} />
           </Routes>
         </main>
       </div>
