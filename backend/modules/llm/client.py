@@ -7,7 +7,7 @@ class LLMClient(BaseProcessor):
     def __init__(self):
         self.api_key = settings.OPENAI_API_KEY
         openai.api_key = self.api_key
-        self.default_model = "gpt-4"
+        self.default_model = "gpt-4o-mini"
 
     async def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """

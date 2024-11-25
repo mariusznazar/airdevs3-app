@@ -2,6 +2,7 @@ from typing import Dict, Any, Optional
 from openai import AsyncOpenAI
 from django.conf import settings
 from .prompts.manager import PromptManager
+from pathlib import Path
 
 class OpenAIClient:
     def __init__(self):
@@ -10,30 +11,39 @@ class OpenAIClient:
 
     async def chat_completion(
         self,
-        prompt_key: str = None,
-        prompt_vars: Dict[str, Any] = None,
-        messages: list = None,
-        model: str = "gpt-4o-mini",
-        temperature: float = 0.7
+        messages: list,
+        model: str = "gpt-4o",
+        temperature: float = 0.5
     ) -> Dict[str, Any]:
         """
-        Get completion from ChatGPT with either raw messages or prompt template
+        Get completion from ChatGPT
         """
         try:
-            if messages is None and prompt_key:
-                prompt = self.prompt_manager.get_prompt(prompt_key, **prompt_vars)
-                messages = [{"role": "user", "content": prompt}]
-            
+            print("\n=== OpenAI Request ===")
+            print(f"Model: {model}")
+            print(f"Temperature: {temperature}")
+            print("Messages:")
+            for msg in messages:
+                print(f"[{msg['role']}]: {msg['content'][:200]}...")  # Pokazujemy pierwsze 200 znaków
+
             response = await self.client.chat.completions.create(
                 model=model,
                 messages=messages,
                 temperature=temperature
             )
+
+            print("\n=== OpenAI Response ===")
+            print(f"Raw response object: {response}")
+            print(f"First choice content: {response.choices[0].message.content}")
+
             return {
                 "status": "success",
                 "content": response.choices[0].message.content
             }
         except Exception as e:
+            print(f"\n=== OpenAI Error ===")
+            print(f"Error type: {type(e)}")
+            print(f"Error message: {str(e)}")
             return {"status": "error", "error": str(e)}
 
     async def generate_image(
@@ -71,15 +81,18 @@ class OpenAIClient:
         Transcribe audio using Whisper
         """
         try:
+            print(f"Attempting to transcribe file: {audio_file}")
             response = await self.client.audio.transcriptions.create(
                 model=model,
                 file=audio_file
             )
+            print(f"Got response: {response}")
             return {
                 "status": "success",
                 "text": response.text
             }
         except Exception as e:
+            print(f"Error in transcribe_audio: {e}")
             return {"status": "error", "error": str(e)}
 
     async def chat_completion_with_vision(
@@ -119,4 +132,26 @@ class OpenAIClient:
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
+
+    def transcribe_audio(self, audio_file_path: str | Path) -> str:
+        """
+        Transcribes audio file using OpenAI Whisper model.
+        
+        Args:
+            audio_file_path: Path to the audio file
+        
+        Returns:
+            str: Transcribed text from the audio file
+        """
+        audio_path = Path(audio_file_path)
+        if not audio_path.exists():
+            raise FileNotFoundError(f"Audio file not found at: {audio_path}")
+        
+        with open(audio_path, "rb") as audio_file:
+            transcript = self.client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+        
+        return transcript.text
         

@@ -244,7 +244,16 @@ class TagDocumentsView(APIView):
     @async_view
     async def post(self, request):
         try:
+            action = request.data.get('action', 'tag')
             tagger = DocumentTagger()
+            
+            if action == 'clear':
+                await tagger._clear_tags()
+                return Response({
+                    "status": "success",
+                    "message": "Tags cleared successfully"
+                })
+            
             result = await tagger.process()
             return Response({
                 "status": "success",

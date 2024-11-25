@@ -27,7 +27,7 @@ class FileAnalysis(models.Model):
     content = models.TextField(null=True, blank=True)
     raw_content = models.BinaryField(null=True, blank=True)
     category = models.CharField(max_length=50, null=True, blank=True)
-    keywords = models.TextField(null=True, blank=True)
+    keywords = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,6 +54,6 @@ class Document(models.Model):
         return self.url
 
 class TagList(models.Model):
-    tags = models.TextField()
+    tags = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
