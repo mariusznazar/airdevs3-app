@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { processWebPage } from '../services/apiService';
+import { processWebPage, analyzeArxiv } from '../services/apiService';
 
 interface CrawlResult {
   status: string;
@@ -18,6 +18,8 @@ export const WebCrawler = () => {
   const [result, setResult] = useState<CrawlResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisStatus, setAnalysisStatus] = useState<string | null>(null);
 
   const handleCrawl = async () => {
     if (!url) {
@@ -43,6 +45,25 @@ export const WebCrawler = () => {
     }
   };
 
+  const handleAnalyzeArxiv = async () => {
+    setAnalyzing(true);
+    setAnalysisStatus(null);
+    setError(null);
+    
+    try {
+      const response = await analyzeArxiv();
+      if (response.status === 'success') {
+        setAnalysisStatus('Analysis completed successfully');
+      } else {
+        setError(response.message || 'Failed to analyze document');
+      }
+    } catch (err) {
+      setError('Error analyzing document: ' + (err as Error).message);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -64,6 +85,24 @@ export const WebCrawler = () => {
             {loading ? 'Processing...' : 'Process'}
           </button>
         </div>
+
+        {/* Analyze Arxiv Button */}
+        {result?.url === 'https://centrala.ag3nts.org/dane/arxiv-draft.html' && (
+          <div className="mt-4">
+            <button
+              onClick={handleAnalyzeArxiv}
+              disabled={analyzing}
+              className="w-full px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+            >
+              {analyzing ? 'Analyzing...' : 'Analyze Arxiv Document'}
+            </button>
+            {analysisStatus && (
+              <div className="mt-2 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400">
+                {analysisStatus}
+              </div>
+            )}
+          </div>
+        )}
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">

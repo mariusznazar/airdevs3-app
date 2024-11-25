@@ -16,6 +16,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
 from modules.web_crawler import WebCrawlerProcessor
 from asgiref.sync import sync_to_async
+from modules.document_analyzer import DocumentAnalyzer
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -214,4 +216,25 @@ def process_webpage(request):
         return Response({
             'status': 'error',
             'message': str(e)
+        }, status=500) 
+
+def async_view(view_func):
+    """Decorator to handle async views"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        return async_to_sync(view_func)(request, *args, **kwargs)
+    return wrapper
+
+@api_view(['POST'])
+@async_view
+async def analyze_arxiv(request):
+    """Analyze arxiv document and send report"""
+    try:
+        analyzer = DocumentAnalyzer()
+        await analyzer.analyze_arxiv_document()
+        return Response({"status": "success"})
+    except Exception as e:
+        return Response({
+            "status": "error",
+            "message": str(e)
         }, status=500) 

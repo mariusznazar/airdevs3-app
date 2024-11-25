@@ -12,9 +12,12 @@ from asgiref.sync import sync_to_async
 from .openai_client import OpenAIClient
 from modules.text.analyzer import TextAnalyzer
 from io import BytesIO
+from .base_reporter import BaseReporter
 
 class FileAnalyzer(BaseProcessor):
     def __init__(self):
+        super().__init__()
+        self.reporter = BaseReporter()
         self.openai_client = OpenAIClient()
         self.data_dir = os.path.join(settings.BASE_DIR, 'data', 'raw', 'pliki_z_fabryki')
         print(f"Looking for files in: {self.data_dir}")
@@ -286,29 +289,8 @@ class FileAnalyzer(BaseProcessor):
 
     async def _send_report(self, categorized_files: Dict[str, List[str]]) -> None:
         """Send report to central server"""
-        # Upewnijmy się, że mamy poprawny format
-        report = {
-            "task": "kategorie",
-            "apikey": settings.DEFAULT_API_KEY,
-            "answer": {
-                "people": categorized_files.get('people', []),
-                "hardware": categorized_files.get('hardware', [])
-            }
+        answer = {
+            "people": categorized_files.get('people', []),
+            "hardware": categorized_files.get('hardware', [])
         }
-        
-        print("Sending report with payload:", json.dumps(report, indent=2))
-        
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(f"{settings.CENTRAL_URL}/report", json=report) as response:
-                    response_text = await response.text()
-                    print(f"Server response status: {response.status}")
-                    print(f"Server response body: {response_text}")
-                    
-                    if response.status != 200:
-                        raise Exception(f"Error sending report: {response_text}")
-                    else:
-                        print("Report sent successfully")
-        except Exception as e:
-            print(f"Error sending report: {str(e)}")
-            raise
+        await self.reporter.send_report("kategorie", answer)

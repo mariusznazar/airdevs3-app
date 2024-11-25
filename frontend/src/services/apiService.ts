@@ -70,4 +70,19 @@ export const processWebPage = async (url: string) => {
     body: JSON.stringify({ url }),
   });
   return await response.json();
+};
+
+export const analyzeArxiv = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analyze-arxiv/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error analyzing arxiv:', error);
+    throw error;
+  }
 }; 
