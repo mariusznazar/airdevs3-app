@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { AITools } from './pages/AITools.tsx';
 import { FileAnalyzer } from './pages/FileAnalyzer.tsx';
+import { WebCrawler } from './pages/WebCrawler.tsx';
 
 const App: React.FC = () => {
   return (
@@ -28,6 +29,12 @@ const App: React.FC = () => {
                 >
                   File Analyzer
                 </Link>
+                <Link
+                  to="/web-crawler"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-orange-400 hover:bg-gray-800 transition-colors"
+                >
+                  Web Crawler
+                </Link>
               </div>
             </div>
           </div>
@@ -38,6 +45,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/ai-tools" replace />} />
             <Route path="/ai-tools" element={<AITools />} />
             <Route path="/file-analyzer" element={<FileAnalyzer />} />
+            <Route path="/web-crawler" element={<WebCrawler />} />
           </Routes>
         </main>
       </div>

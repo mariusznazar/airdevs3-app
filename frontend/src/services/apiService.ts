@@ -59,4 +59,15 @@ export const processAudio = async (request: ProcessAudioRequest) => {
     body: formData,
   });
   return await response.json();
+};
+
+export const processWebPage = async (url: string) => {
+  const response = await fetch(`${API_BASE_URL}/web-crawler/process/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  });
+  return await response.json();
 }; 

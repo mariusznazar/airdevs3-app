@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import TextLLMView, AudioLLMView, ImageLLMView
+from .views import TextLLMView, AudioLLMView, ImageLLMView, process_webpage
 
 app_name = 'core'
 
@@ -9,4 +9,5 @@ urlpatterns = [
     path('llm/text/', TextLLMView.as_view(), name='llm-text'),
     path('llm/audio/', AudioLLMView.as_view(), name='llm-audio'),
     path('llm/image/', ImageLLMView.as_view(), name='llm-image'),
+    path('web-crawler/process/', process_webpage, name='process-webpage'),
 ] 

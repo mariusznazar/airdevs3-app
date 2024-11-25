@@ -14,6 +14,8 @@ import asyncio
 from .models import FileAnalysis
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
+from modules.web_crawler import WebCrawlerProcessor
+from asgiref.sync import sync_to_async
 
 logger = logging.getLogger(__name__)
 
@@ -190,3 +192,26 @@ class AnalysisListView(APIView):
         }
         
         return Response(summary) 
+
+@api_view(['POST'])
+def process_webpage(request):
+    """
+    Process webpage and extract content with media
+    """
+    url = request.data.get('url')
+    if not url:
+        return Response({
+            'status': 'error',
+            'message': 'URL is required'
+        }, status=400)
+        
+    try:
+        crawler = WebCrawlerProcessor()
+        # Używamy async_to_sync do wywołania asynchronicznej metody
+        result = async_to_sync(crawler.process_url)(url)
+        return Response(result)
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=500) 

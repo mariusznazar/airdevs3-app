@@ -97,7 +97,7 @@ class OpenAIClient:
                     "content": [
                         {
                             "type": "text",
-                            "text": "Opisz co widzisz na tym zdjęciu, skupiając się na informacjach o ludziach lub usterkach sprzętowych."
+                            "text": "Opisz co widzisz na tym zdjęciu."
                         },
                         {
                             "type": "image_url",

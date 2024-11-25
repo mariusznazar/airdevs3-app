@@ -155,3 +155,5 @@ DEFAULT_API_KEY = os.getenv('DEFAULT_API_KEY')
 # Data directory
 DATA_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'pliki_z_fabryki')
 os.makedirs(DATA_DIR, exist_ok=True) 
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

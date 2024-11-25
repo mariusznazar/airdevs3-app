@@ -11,6 +11,7 @@ from datetime import timedelta
 from asgiref.sync import sync_to_async
 from .openai_client import OpenAIClient
 from modules.text.analyzer import TextAnalyzer
+from io import BytesIO
 
 class FileAnalyzer(BaseProcessor):
     def __init__(self):
@@ -58,16 +59,26 @@ class FileAnalyzer(BaseProcessor):
             return None
 
     @sync_to_async
-    def _save_analysis(self, file_name: str, file_type: str, content: str, category: str = None) -> None:
-        """Save or update analysis in cache"""
-        FileAnalysis.objects.update_or_create(
-            file_name=file_name,
-            defaults={
-                'file_type': file_type,
-                'content': content,
-                'category': category
-            }
-        )
+    def _save_analysis(self, file_name: str, file_type: str, content: str, raw_content: bytes = None, category: str = None) -> None:
+        """Save analysis to database"""
+        try:
+            # Normalizujemy nazwę pliku - bierzemy część po ::
+            if '::' in file_name:
+                file_name = file_name.split('::')[1]
+            
+            print(f"Saving analysis for normalized file name: {file_name}")
+            
+            FileAnalysis.objects.update_or_create(
+                file_name=file_name,
+                defaults={
+                    'file_type': file_type,
+                    'content': content,
+                    'raw_content': raw_content,
+                    'category': category
+                }
+            )
+        except Exception as e:
+            print(f"Error saving analysis: {str(e)}")
 
     async def process(self) -> Dict[str, List[str]]:
         """Main processing method"""
@@ -153,29 +164,38 @@ class FileAnalyzer(BaseProcessor):
             print(f"Error reading text file {file_path}: {str(e)}")
             return ""
 
-    async def _process_image(self, file_path: str) -> str:
+    async def _process_image(self, file_obj: BytesIO) -> str:
         """Process image files"""
         try:
-            print(f"\n=== Processing image: {file_path} ===")
-            with open(file_path, 'rb') as file:
-                image_data = base64.b64encode(file.read()).decode('utf-8')
-                
-                response = await self.openai_client.chat_completion_with_vision(
-                    image_data=f"data:image/png;base64,{image_data}",
-                    prompt_key="analyze_image",
-                    prompt_vars={},
-                    model="gpt-4o-mini"  # Użyj właściwego modelu dla vision
-                )
-                
-                print("Received image response from OpenAI:", response)
-                if response.get("status") == "success":
-                    content = response.get('content', '')
-                    if content:
-                        print(f"Extracted content from image response: {content}")
-                        return content
-                return ""
+            print(f"\n=== Processing image: {file_obj.name} ===")
+            
+            # Wyciągamy samą nazwę pliku bez ścieżki
+            file_name = os.path.basename(file_obj.name)
+            if '::' in file_name:
+                # Jeśli nazwa zawiera separator ::, bierzemy część po nim
+                file_name = file_name.split('::')[1]
+            
+            print(f"Processing image with normalized name: {file_name}")
+            
+            # Konwertujemy BytesIO na base64
+            image_data = base64.b64encode(file_obj.getvalue()).decode('utf-8')
+            
+            response = await self.openai_client.chat_completion_with_vision(
+                image_data=f"data:image/png;base64,{image_data}",
+                prompt_key="analyze_image",
+                prompt_vars={},
+                model="gpt-4o-mini"
+            )
+            
+            print("Received image response from OpenAI:", response)
+            if response.get("status") == "success":
+                content = response.get('content', '')
+                if content:
+                    print(f"Extracted content from image response: {content}")
+                    return content
+            return ""
         except Exception as e:
-            print(f"Error processing image {file_path}: {str(e)}")
+            print(f"Error processing image {file_name}: {str(e)}")
             print(f"Full error details:", e.__class__.__name__, str(e))
             return ""
 
