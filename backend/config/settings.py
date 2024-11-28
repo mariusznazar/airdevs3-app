@@ -157,6 +157,8 @@ DATA_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'pliki_z_fabryki')
 os.makedirs(DATA_DIR, exist_ok=True) 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 NEO4J_CONFIG = {
     'URI': 'bolt://localhost:7687',
     'USERNAME': 'neo4j',

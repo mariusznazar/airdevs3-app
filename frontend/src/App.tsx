@@ -5,6 +5,7 @@ import { FileAnalyzer } from './pages/FileAnalyzer.tsx';
 import { WebCrawler } from './pages/WebCrawler.tsx';
 import { DocumentTagger } from './pages/DocumentTagger.tsx';
 import { GraphProcessor } from './pages/GraphProcessor.tsx';
+import { PhotoAnalyzer } from './pages/PhotoAnalyzer.tsx';
 
 const App: React.FC = () => {
   return (
@@ -49,6 +50,12 @@ const App: React.FC = () => {
                 >
                   Graph Processor
                 </Link>
+                <Link
+                  to="/photo-analyzer"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-orange-400 hover:bg-gray-800 transition-colors"
+                >
+                  Photo Analyzer
+                </Link>
               </div>
             </div>
           </div>
@@ -62,6 +69,7 @@ const App: React.FC = () => {
             <Route path="/web-crawler" element={<WebCrawler />} />
             <Route path="/document-tagger" element={<DocumentTagger />} />
             <Route path="/graph-processor" element={<GraphProcessor />} />
+            <Route path="/photo-analyzer" element={<PhotoAnalyzer />} />
           </Routes>
         </main>
       </div>

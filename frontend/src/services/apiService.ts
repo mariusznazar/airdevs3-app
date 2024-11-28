@@ -1,88 +1,124 @@
-interface Message {
-  role: 'system' | 'user' | 'assistant';
-  content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
-}
+import axios from 'axios';
 
-interface ProcessRequestBase {
-  model: string;
-  messages: Message[];
-}
-
-interface ProcessTextRequest extends ProcessRequestBase {}
-
-interface ProcessImageRequest extends ProcessRequestBase {
-  imageFile: File;
-}
-
-interface ProcessAudioRequest extends ProcessRequestBase {
-  audioFile: File;
-}
-
-const API_BASE_URL = 'http://localhost:8000/api';
-
-export const processText = async (request: ProcessTextRequest) => {
-  const response = await fetch(`${API_BASE_URL}/llm/text/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-  return await response.json();
+// Add loading state management
+let loadingState = {
+  isLoading: false,
+  setLoading: (state: boolean) => {
+    loadingState.isLoading = state;
+    if (loadingState.onLoadingChange) {
+      loadingState.onLoadingChange(state);
+    }
+  },
+  onLoadingChange: null as ((state: boolean) => void) | null
 };
 
-export const processImage = async (request: ProcessImageRequest) => {
-  const formData = new FormData();
-  formData.append('image', request.imageFile);
-  formData.append('data', JSON.stringify({
-    model: request.model,
-    messages: request.messages,
-  }));
-
-  const response = await fetch(`${API_BASE_URL}/llm/image/`, {
-    method: 'POST',
-    body: formData,
-  });
-  return await response.json();
+export const setLoadingCallback = (callback: (state: boolean) => void) => {
+  loadingState.onLoadingChange = callback;
 };
 
-export const processAudio = async (request: ProcessAudioRequest) => {
-  const formData = new FormData();
-  formData.append('audio', request.audioFile);
-  formData.append('data', JSON.stringify({
-    model: request.model,
-    messages: request.messages,
-  }));
-
-  const response = await fetch(`${API_BASE_URL}/llm/audio/`, {
-    method: 'POST',
-    body: formData,
-  });
-  return await response.json();
+// Text processing endpoints
+export const processText = async (text: string) => {
+  loadingState.setLoading(true);
+  try {
+    const response = await axios.post('/api/process-text', { text });
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
 };
 
+export const generateText = async (prompt: string) => {
+  loadingState.setLoading(true);
+  try {
+    const response = await axios.post('/api/generate-text', { prompt });
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
+};
+
+// Image processing endpoints
+export const processImage = async (imageUrl: string) => {
+  loadingState.setLoading(true);
+  try {
+    const response = await axios.post('/api/process-image', { url: imageUrl });
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
+};
+
+// Audio processing endpoints
+export const processAudio = async (audioUrl: string) => {
+  loadingState.setLoading(true);
+  try {
+    const response = await axios.post('/api/process-audio', { url: audioUrl });
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
+};
+
+// Web Crawler API endpoints
 export const processWebPage = async (url: string) => {
-  const response = await fetch(`${API_BASE_URL}/web-crawler/process/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ url }),
-  });
-  return await response.json();
+  loadingState.setLoading(true);
+  try {
+    const response = await axios.post('/api/process-webpage', { url });
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
 };
 
 export const analyzeArxiv = async () => {
+  loadingState.setLoading(true);
   try {
-    const response = await fetch(`${API_BASE_URL}/analyze-arxiv/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return await response.json();
-  } catch (error) {
-    console.error('Error analyzing arxiv:', error);
-    throw error;
+    const response = await axios.post('/api/analyze-arxiv');
+    return response.data;
+  } finally {
+    loadingState.setLoading(false);
+  }
+};
+
+// PhotoAnalyzer API endpoints
+export const photoAnalyzerApi = {
+  startConversation: async () => {
+    loadingState.setLoading(true);
+    try {
+      const response = await axios.post('/api/conversation/start');
+      return response.data;
+    } finally {
+      loadingState.setLoading(false);
+    }
+  },
+
+  sendCommand: async (command: string) => {
+    loadingState.setLoading(true);
+    try {
+      const response = await axios.post('/api/conversation/command', { command });
+      return response.data;
+    } finally {
+      loadingState.setLoading(false);
+    }
+  },
+
+  sendDescription: async (description: string) => {
+    loadingState.setLoading(true);
+    try {
+      const response = await axios.post('/api/conversation/description', { description });
+      return response.data;
+    } finally {
+      loadingState.setLoading(false);
+    }
+  },
+
+  clearCache: async () => {
+    loadingState.setLoading(true);
+    try {
+      const response = await axios.post('/api/conversation/clear-cache');
+      return response.data;
+    } finally {
+      loadingState.setLoading(false);
+    }
   }
 }; 
