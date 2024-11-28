@@ -1,0 +1,31 @@
+﻿{
+    "thinking":  {
+                     "instruction":  "Dron poleciaÅ w stronÄ gÃ³r, ale zatrzymaÅ siÄ obok wiatraka. Potem przeleciaÅ nad wiatrakiem i zatrzymaÅ siÄ obok skaÅ.",
+                     "directions":  {
+                                        "top":  "[x,3]",
+                                        "bottom":  "[x,0]",
+                                        "right":  "[3,y]",
+                                        "left":  "[0,y]"
+                                    },
+                     "stages":  {
+                                    "stage_1":  {
+                                                    "task":  "poleciaÅ w stronÄ gÃ³r, ale zatrzymaÅ siÄ obok wiatraka",
+                                                    "starting_position":  "[0,3]",
+                                                    "vector":  "down",
+                                                    "steps":  1,
+                                                    "end_position":  "[1,2]",
+                                                    "reasoning":  "Starting position is [0,3]. Moving down towards the mountains, but stopping next to the windmill at [1,2]."
+                                                },
+                                    "stage_2":  {
+                                                    "task":  "przeleciaÅ nad wiatrakiem i zatrzymaÅ siÄ obok skaÅ",
+                                                    "starting_position":  "[1,2]",
+                                                    "vector":  "right",
+                                                    "steps":  1,
+                                                    "end_position":  "[2,1]",
+                                                    "reasoning":  "Starting position is [1,2]. Flying over the windmill at [1,2] to the rocks at [2,1], stopping next to them."
+                                                }
+                                },
+                     "summary":  "The final stage ended at position [2,1]. According to the map, there are rocks at this position."
+                 },
+    "description":  "rocks"
+}

@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'azyl-51983.ag3nts.org']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -94,6 +94,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
+    "https://azyl-51983.ag3nts.org"
 ]
 CORS_ALLOWED_METHODS = [
     'GET',
@@ -164,3 +165,42 @@ NEO4J_CONFIG = {
     'USERNAME': 'neo4j',
     'PASSWORD': 'aidevs12345',
 }
+
+# Create logs directory
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+# Update the LOGGING configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'pilot.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'api.views.pilot_views': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+# Ustawienia HTTPS
+SECURE_PROXY_SSL_HEADER = None
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
